@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #007bff;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Expense Tracker Test Page</h1>
+  <p>This page tests various components of the Expense Tracker application to help diagnose issues.</p>
+  
+  <div class="test-section">
+    <h2>1. LocalStorage Test</h2>
+    <button onclick="testLocalStorage()">Test LocalStorage</button>
+    <div id="localStorage-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>2. Chart.js Test</h2>
+    <button onclick="testChartJs()">Test Chart.js</button>
+    <div id="chartjs-result"></div>
+    <canvas id="test-chart" width="400" height="200"></canvas>
+  </div>
+  
+  <div class="test-section">
+    <h2>3. Path Test</h2>
+    <p>Current URL: <span id="current-url"></span></p>
+    <p>Base URL: <span id="base-url"></span></p>
+    <p>Login Path: <span id="login-path"></span></p>
+    <p>Main Path: <span id="main-path"></span></p>
+  </div>
+  
+  <script>
+    // Display current URL information
+    document.getElementById('current-url').textContent = window.location.href;
+    const baseUrl = window.location.href.split('/test.html')[0];
+    document.getElementById('base-url').textContent = baseUrl;
+    document.getElementById('login-path').textContent = baseUrl + '/login/login.html';
+    document.getElementById('main-path').textContent = baseUrl + '/main/index.html';
+    
+    // Test LocalStorage
+    function testLocalStorage() {
+      const result = document.getElementById('localStorage-result');
+      try {
+        localStorage.setItem('test', 'working');
+        const value = localStorage.getItem('test');
+        if (value === 'working') {
+          result.innerHTML = '<p class="success">LocalStorage is working correctly!</p>';
+          localStorage.removeItem('test');
+        } else {
+          result.innerHTML = '<p class="error">LocalStorage read/write mismatch.</p>';
+        }
+      } catch (e) {
+        result.innerHTML = `<p class="error">LocalStorage error: ${e.message}</p>`;
+      }
+    }
+    
+    // Test Chart.js
+    function testChartJs() {
+      const result = document.getElementById('chartjs-result');
+      
+      if (typeof Chart === 'undefined') {
+        result.innerHTML = '<p class="error">Chart.js is not loaded. Loading from CDN...</p>';
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+        script.onload = function() {
+          result.innerHTML = '<p class="success">Chart.js loaded successfully from fallback CDN!</p>';
+          createTestChart();
+        };
+        script.onerror = function() {
+          result.innerHTML = '<p class="error">Failed to load Chart.js from fallback CDN.</p>';
+        };
+        document.head.appendChild(script);
+      } else {
+        result.innerHTML = '<p class="success">Chart.js is already loaded!</p>';
+        createTestChart();
+      }
+    }
+    
+    function createTestChart() {
+      try {
+        const ctx = document.getElementById('test-chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green'],
+            datasets: [{
+              label: 'Test Data',
+              data: [12, 19, 3, 5],
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)'
+              ],
+              borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+        document.getElementById('chartjs-result').innerHTML += '<p class="success">Test chart created successfully!</p>';
+      } catch (e) {
+        document.getElementById('chartjs-result').innerHTML += `<p class="error">Error creating chart: ${e.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
